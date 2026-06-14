@@ -1,0 +1,1 @@
+from .loader import load_mnist_data
