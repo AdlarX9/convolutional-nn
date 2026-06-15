@@ -5,7 +5,6 @@ from .conv import Conv
 from .biais import ConvBiais, Biais
 from .activation import ReLU
 from .fc import FC
-from .flatten import Flatten
 from graphics import ConsoleVisualization
 
 
@@ -52,7 +51,8 @@ class Network:
         for layer in self.layers:
             volume = layer.compute(volume, memorize)
         # Softmax
-        exp_volume = np.exp(volume)
+        volume_max = np.max(volume)
+        exp_volume = np.exp(volume - volume_max)  # Soustrait le max
         softmax = exp_volume / np.sum(exp_volume)
         return softmax
 
@@ -60,7 +60,9 @@ class Network:
         self: Network, entry: NDArray[np.float64], answer: NDArray[np.float64]
     ) -> tuple[float, bool]:
         prediction = self.compute(entry, memorize=True)
-        loss = -np.sum(answer * np.log(prediction))  # cross-entropy
+        epsilon = 1e-10
+        prediction = np.clip(prediction, epsilon, 1 - epsilon)
+        loss = -np.sum(answer * np.log(prediction))
         correct = bool(np.argmax(prediction) == np.argmax(answer))
         gradient = prediction - answer  # cross-entropy + softmax
         for i in range(len(self.layers) - 1, -1, -1):
