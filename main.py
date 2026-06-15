@@ -5,17 +5,17 @@ from graphics import visualize
 
 def main() -> None:
     layers = [
+        Conv(32, 3, 2),
+        Conv(64, 3, 2),
+        Conv(128, 3, 2),
         Flatten(),
-        FC(1000),
-        FC(100),
         FC(10),
     ]
 
     data = load_mnist_data()
-    data = data[:10000]
-    network = Network(layers=layers, lr=0.001, input_shape=(1, 28, 28))
+    network = Network(layers=layers, lr=0.005, input_shape=(1, 28, 28))
     network.train(data=data, batch=1)
-    SaveHandler().save(network, "number_guesser")
+    SaveHandler().save(network, 'conv')
     visualize(network)
 
 
