@@ -4,7 +4,7 @@ from .layer import Layer
 
 
 class FC(Layer):
-    def __init__(self: FC, n: int) -> None:
+    def __init__(self: FC, n: int = 0) -> None:
         self.n: int = n
         self.p: int = 0
         self.W = np.array([[]])
@@ -25,3 +25,16 @@ class FC(Layer):
         new_gradient = self.W.T @ gradient
         self.W -= self.lr * (gradient @ self.input.T)
         return new_gradient
+
+    def get_data(self: FC) -> tuple[list[int], list[float]]:
+        int_list = list(self.input_shape) + [self.n, self.p]
+        float_list = [self.lr] + self.W.flatten().tolist()
+        return int_list, float_list
+
+    def load_from_data(self: FC, int_list: list[int], float_list: list[float]) -> None:
+        self.input_shape = tuple(int_list[:2])
+        self.n = int_list[2]
+        self.p = int_list[3]
+        self.lr = float_list[0]
+        del float_list[0]
+        self.W = np.array(float_list).reshape(self.n, self.p)

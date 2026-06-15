@@ -5,18 +5,24 @@ from .conv import Conv
 from .biais import ConvBiais, Biais
 from .activation import ReLU
 from .fc import FC
+from .flatten import Flatten
 from graphics import ConsoleVisualization
 
 
 class Network:
     def __init__(
-        self: Network, layers: list[Layer], input_shape: tuple[int, int, int], lr: float = 0.0001
+        self: Network,
+        layers: list[Layer] = [],
+        input_shape: tuple[int, int, int] = (0, 0, 0),
+        lr: float = 0.0001,
     ) -> None:
         self.lr = lr
         self.input_shape = input_shape
         self.layers = self.build_layers(layers)
 
     def build_layers(self: Network, layers: list[Layer]) -> list[Layer]:
+        if len(layers) == 0:
+            return []
         new_layers: list[Layer] = []
         # Add unprecised layers
         for i in range(len(layers)):

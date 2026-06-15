@@ -4,7 +4,7 @@ from .layer import Layer
 
 
 class Conv(Layer):
-    def __init__(self: Conv, N: int, K: int, S: int):
+    def __init__(self: Conv, N: int = 0, K: int = 0, S: int = 0):
         self.K = K  # Watching field dimension
         self.S = S  # Stride
         self.N = N
@@ -69,3 +69,23 @@ class Conv(Layer):
             self.kernels[k] -= self.lr * W_gradient
 
         return new_gradient
+
+    def get_data(self: Conv) -> tuple[list[int], list[float]]:
+        int_list = list(self.input_shape) + [self.K, self.S, self.N]
+        float_list = [self.lr]
+        for kernel in self.kernels:
+            float_list += kernel.flatten().tolist()
+        return int_list, float_list
+
+    def load_from_data(self: Conv, int_list: list[int], float_list: list[float]) -> None:
+        self.input_shape = tuple(int_list[:3])
+        self.K = int_list[3]
+        self.S = int_list[4]
+        self.N = int_list[5]
+        self.lr = float_list[0]
+        del float_list[0]
+        self.kernels = []
+        for _ in range(self.N):
+            length = self.input_shape[0] * self.K**2
+            self.kernels += np.array(float_list[:length]).reshape(self.input_shape[0], self.K, self.K)
+            del float_list[:length]

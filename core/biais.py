@@ -19,6 +19,17 @@ class Biais(Layer):
         self.B -= self.lr * gradient
         return gradient
 
+    def get_data(self: Biais) -> tuple[list[int], list[float]]:
+        int_list = list(self.input_shape)
+        float_list = [self.lr] + self.B.flatten().tolist()
+        return int_list, float_list
+
+    def load_from_data(self: Biais, int_list: list[int], float_list: list[float]) -> None:
+        self.input_shape = tuple(int_list)
+        self.lr = float_list[0]
+        del float_list[0]
+        self.B = np.array(float_list).reshape(self.input_shape[0], 1)
+
 
 class ConvBiais(Layer):
     def __init__(self: ConvBiais) -> None:
@@ -36,3 +47,14 @@ class ConvBiais(Layer):
         for i in range(self.B.shape[0]):
             self.B[i, 0] -= self.lr * np.sum(gradient[i, :, :])
         return gradient
+
+    def get_data(self: ConvBiais) -> tuple[list[int], list[float]]:
+        int_list = list(self.input_shape)
+        float_list = [self.lr] + self.B.flatten().tolist()
+        return int_list, float_list
+
+    def load_from_data(self: ConvBiais, int_list: list[int], float_list: list[float]) -> None:
+        self.input_shape = tuple(int_list)
+        self.lr = float_list[0]
+        del float_list[0]
+        self.B = np.array(float_list).reshape(self.input_shape[0], 1)

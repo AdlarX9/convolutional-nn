@@ -5,7 +5,7 @@ from .layer import Layer
 
 class ReLU(Layer):
     def __init__(self: ReLU) -> None:
-        return
+        super().__init__()
 
     def feed_forward(self: ReLU, entry: NDArray[np.float64]) -> NDArray[np.float64]:
         return np.maximum(0, entry)
