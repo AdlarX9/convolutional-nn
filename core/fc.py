@@ -5,6 +5,7 @@ from .layer import Layer
 
 class FC(Layer):
     def __init__(self: FC, n: int = 0) -> None:
+        super().__init__()
         self.n: int = n
         self.p: int = 0
         self.W = np.array([[]])

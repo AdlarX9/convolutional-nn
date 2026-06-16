@@ -1,3 +1,3 @@
 # Models
 
-The models are saved here
+The models are saved here, with names ending by `.cnn`.

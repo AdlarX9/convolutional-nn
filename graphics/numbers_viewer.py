@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from core import Network
 
 GRID_SIZE: Tuple[int, int] = (28, 28)
-PIXEL_SIZE = 40
+PIXEL_SIZE = 30
 PRED_BAR_WIDTH = 240
 
 

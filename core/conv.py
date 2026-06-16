@@ -36,6 +36,7 @@ def col2im(
 
 class Conv(Layer):
     def __init__(self: Conv, N: int = 0, K: int = 0, S: int = 0):
+        super().__init__()
         self.K = K  # Watching field dimension
         self.S = S  # Stride
         self.N = N

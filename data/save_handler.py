@@ -1,6 +1,7 @@
 from core import Network, Layer, Conv, FC, Biais, ConvBiais, ReLU, Flatten
 import os
 import struct
+from pathlib import Path
 
 layer_types = [Layer, Conv, FC, Biais, ConvBiais, ReLU, Flatten]
 
@@ -17,6 +18,11 @@ class SaveHandler:
         if getattr(self, "_initialized", False):
             return
         self._initialized = True
+
+    def has(self: SaveHandler, name: str) -> bool:
+        path = os.path.join("data", "models", name + ".cnn")
+        path = Path(path)
+        return path.exists()
 
     def save(self: SaveHandler, network: Network, name: str) -> None:
         path = os.path.join("data", "models", name + ".cnn")

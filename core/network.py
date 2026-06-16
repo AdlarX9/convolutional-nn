@@ -5,6 +5,7 @@ from .conv import Conv
 from .biais import ConvBiais, Biais
 from .activation import ReLU
 from .fc import FC
+from .exit import ExitLoss
 from graphics import ConsoleVisualization
 
 
@@ -12,11 +13,13 @@ class Network:
     def __init__(
         self: Network,
         layers: list[Layer] = [],
+        exit_loss: ExitLoss = ExitLoss(),
         input_shape: tuple[int, int, int] = (0, 0, 0),
         lr: float = 0.0001,
     ) -> None:
         self.lr = lr
         self.input_shape = input_shape
+        self.exit_loss = exit_loss
         self.layers = self.build_layers(layers)
 
     def build_layers(self: Network, layers: list[Layer]) -> list[Layer]:
@@ -50,21 +53,16 @@ class Network:
         volume = entry
         for layer in self.layers:
             volume = layer.compute(volume, memorize)
-        # Softmax
-        volume_max = np.max(volume)
-        exp_volume = np.exp(volume - volume_max)  # Soustrait le max
-        softmax = exp_volume / np.sum(exp_volume)
-        return softmax
+        volume = self.exit_loss.feed_forward(volume)
+        return volume
 
     def single_train(
         self: Network, entry: NDArray[np.float64], answer: NDArray[np.float64]
     ) -> tuple[float, bool]:
         prediction = self.compute(entry, memorize=True)
-        epsilon = 1e-10
-        prediction = np.clip(prediction, epsilon, 1 - epsilon)
-        loss = -np.sum(answer * np.log(prediction))
+        loss = self.exit_loss.get_loss(prediction, answer)
+        gradient = self.exit_loss.get_gradient(prediction, answer)
         correct = bool(np.argmax(prediction) == np.argmax(answer))
-        gradient = prediction - answer  # cross-entropy + softmax
         for i in range(len(self.layers) - 1, -1, -1):
             gradient = self.layers[i].descend_gradient(gradient)
         return loss, correct

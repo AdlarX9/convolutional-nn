@@ -5,6 +5,7 @@ from .layer import Layer
 
 class Biais(Layer):
     def __init__(self: Biais) -> None:
+        super().__init__()
         self.B = np.array([[]])
 
     def set_input_shape(self: Biais, input_shape: tuple[int, int]) -> tuple[int, int]:
