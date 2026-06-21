@@ -27,8 +27,7 @@ class Biais(Layer):
 
     def load_from_data(self: Biais, int_list: list[int], float_list: list[float]) -> None:
         self.input_shape = tuple(int_list)
-        self.lr = float_list[0]
-        del float_list[0]
+        self.lr = float_list.pop(0)
         self.B = np.array(float_list).reshape(self.input_shape[0], 1)
 
 
@@ -56,6 +55,5 @@ class ConvBiais(Layer):
 
     def load_from_data(self: ConvBiais, int_list: list[int], float_list: list[float]) -> None:
         self.input_shape = tuple(int_list)
-        self.lr = float_list[0]
-        del float_list[0]
+        self.lr = float_list.pop(0)
         self.B = np.array(float_list).reshape(self.input_shape[0], 1)

@@ -3,4 +3,4 @@
 __pycache__
 data/dataset
 venv
-*.cnn
+*.nn

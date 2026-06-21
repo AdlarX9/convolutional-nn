@@ -167,20 +167,7 @@ class NumbersViewer:
             self.status.config(text=f"Erreur: {exc}")
 
 
-def visualize(network: Network) -> None:
+def view_numbers(network: Network) -> None:
     root = tk.Tk()
     NumbersViewer(root, network)
     root.mainloop()
-
-
-if __name__ == "__main__":
-    # petit test si appelé directement (nécessite numpy)
-    try:
-        from core import Flatten, FC
-
-        net = Network(layers=[Flatten(), FC(10)], input_shape=(1, 28, 28))
-    except Exception:
-        net = None
-
-    if net is not None:
-        visualize(net)

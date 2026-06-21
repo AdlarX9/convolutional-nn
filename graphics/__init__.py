@@ -1,2 +1,3 @@
 from .console import ConsoleVisualization
-from .numbers_viewer import visualize
+from .numbers_viewer import view_numbers
+from .regression import regression

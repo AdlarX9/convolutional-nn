@@ -36,6 +36,5 @@ class FC(Layer):
         self.input_shape = tuple(int_list[:2])
         self.n = int_list[2]
         self.p = int_list[3]
-        self.lr = float_list[0]
-        del float_list[0]
+        self.lr = float_list.pop(0)
         self.W = np.array(float_list).reshape(self.n, self.p)

@@ -14,11 +14,12 @@ class Network:
         self: Network,
         layers: list[Layer] = [],
         exit_loss: ExitLoss = ExitLoss(),
-        input_shape: tuple[int, int, int] = (0, 0, 0),
+        input_shape: tuple = (0,),
         lr: float = 0.0001,
     ) -> None:
         self.lr = lr
         self.input_shape = input_shape
+        self.output_shape = (0,)
         self.exit_loss = exit_loss
         self.layers = self.build_layers(layers)
 
@@ -29,11 +30,11 @@ class Network:
         # Add unprecised layers
         for i in range(len(layers)):
             layer = layers[i]
-            if type(layer) == Conv:
+            if isinstance(layer, Conv):
                 new_layers.append(layer)
                 new_layers.append(ConvBiais())
                 new_layers.append(ReLU())
-            elif type(layer) == FC:
+            elif isinstance(layer, FC):
                 new_layers.append(layer)
                 new_layers.append(Biais())
                 new_layers.append(ReLU())
@@ -41,15 +42,20 @@ class Network:
                 new_layers.append(layer)
         # Set Learning Rate and Input Shape
         volume_shape = self.input_shape
-        for layer in new_layers:
-            layer.set_lr(self.lr)
-            volume_shape = layer.set_input_shape(volume_shape)
+        for i in range(len(new_layers)):
+            new_layers[i].set_lr(self.lr)
+            volume_shape = new_layers[i].set_input_shape(volume_shape)
+            if i == len(new_layers) - 1:
+                self.output_shape = volume_shape
         # Delete last ReLU layer
         if type(new_layers[-1]) == ReLU:
-            del new_layers[-1]
+            new_layers.pop(-1)
         return new_layers
 
-    def compute(self: Network, entry: NDArray[np.float64], memorize=False) -> NDArray[np.float64]:
+    def get_dimensions(self: Network) -> tuple[tuple, tuple]:
+        return self.input_shape, self.output_shape
+
+    def compute(self: Network, entry: NDArray[np.float64], memorize: bool = False) -> NDArray[np.float64]:
         volume = entry
         for layer in self.layers:
             volume = layer.compute(volume, memorize)
