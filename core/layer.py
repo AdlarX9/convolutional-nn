@@ -8,9 +8,6 @@ class Layer:
         self.input: NDArray[np.float64] | None = None
         self.input_shape: tuple = ()
 
-    def get_output_shape(self: Layer) -> tuple:
-        return self.set_input_shape(self.input_shape)
-
     def set_lr(self: Layer, lr: float) -> None:
         self.lr = lr
 

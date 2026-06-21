@@ -80,35 +80,35 @@ class ConsoleVisualization:
 
         lines = [
             "╭" + "─" * max(28, term_width - 2) + "╮",
-            "│ CNN Training Dashboard" + " " * max(0, term_width - 26) + "│",
+            "│ CNN Training Dashboard" + " " * max(0, term_width - 25) + "│",
             "├" + "─" * max(28, term_width - 2) + "┤",
             f"│ Temps écoulé        : {self._format_duration(elapsed)}"
-            + " " * max(0, term_width - 28 - len(self._format_duration(elapsed)))
+            + " " * max(0, term_width - 25 - len(self._format_duration(elapsed)))
             + "│",
             f"│ Temps restant estimé : {self._format_duration(remaining)}"
-            + " " * max(0, term_width - 28 - len(self._format_duration(remaining)))
+            + " " * max(0, term_width - 26 - len(self._format_duration(remaining)))
             + "│",
             f"│ Batch actuel        : {self.batch_index}/{self.total_batches} (restant {batch_remaining:.2f})"
             + " "
             * max(
                 0,
                 term_width
-                - 28
+                - 25
                 - len(f"{self.batch_index}/{self.total_batches} (restant {batch_remaining:.2f})"),
             )
             + "│",
             f"│ Données batch       : {self.item_index}/{self.total_items}"
-            + " " * max(0, term_width - 28 - len(f"{self.item_index}/{self.total_items}"))
+            + " " * max(0, term_width - 25 - len(f"{self.item_index}/{self.total_items}"))
             + "│",
             f"│ Loss                : {self.loss:.6f}"
-            + " " * max(0, term_width - 28 - len(f"{self.loss:.6f}"))
+            + " " * max(0, term_width - 25 - len(f"{self.loss:.6f}"))
             + "│",
             f"│ Accuracy            : {self.accuracy * 100:6.2f}%"
-            + " " * max(0, term_width - 28 - len(f"{self.accuracy * 100:6.2f}%"))
+            + " " * max(0, term_width - 25 - len(f"{self.accuracy * 100:6.2f}%"))
             + "│",
             "├" + "─" * max(28, term_width - 2) + "┤",
             "│ Progression totale" + " " * max(0, term_width - 21) + "│",
-            f"│ [{progress_bar}] {progress * 100:6.2f}%" + " " * max(0, term_width - 18 - bar_width) + "│",
+            f"│ [{progress_bar}] {progress * 100:6.2f}%" + " " * max(0, term_width - 13 - bar_width) + "│",
             "╰" + "─" * max(28, term_width - 2) + "╯",
         ]
 

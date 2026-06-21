@@ -32,7 +32,7 @@ def learn_shape() -> None:
     def curve(x: float, y: float) -> float:
         circle = math.sqrt(0.5 * (x - 0.5) ** 2 + (y - 0.5) ** 2)
         donut = math.sin(7.5 * circle)
-        return circle
+        return donut
     
     def get_data(dim: int) -> list[tuple[NDArray[np.float64], NDArray[np.float64]]]:
         data = []
@@ -54,7 +54,7 @@ def learn_shape() -> None:
     network = Network(layers=layers, exit_loss=ExitLoss(), input_shape=(2, 1), lr=0.0001)
 
     save_handler = SaveHandler()
-    name = "reproduce_shape"
+    name = "reproduce_shape2"
     if save_handler.has(name):
         network = save_handler.load(name)
 
