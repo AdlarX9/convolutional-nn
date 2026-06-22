@@ -1,4 +1,19 @@
-from core import Network, Layer, Conv, FC, Biais, ConvBiais, ReLU, Flatten, ExitLoss, ProbaExit
+from core import (
+    Network,
+    Layer,
+    Conv,
+    FC,
+    Biais,
+    ConvBiais,
+    ReLU,
+    Flatten,
+    ExitLoss,
+    ProbaExit,
+    Block,
+    BN,
+    Pool,
+    Res,
+)
 import os
 import struct
 from io import BufferedWriter, BufferedReader
@@ -15,6 +30,10 @@ layer_types = {
     "Flatten": Flatten,
     "ExitLoss": ExitLoss,
     "ProbaExit": ProbaExit,
+    "Network": Network,
+    "BN": BN,
+    "Pool": Pool,
+    "Res": Res,
 }
 
 
@@ -64,48 +83,48 @@ class SaveHandler:
         s = f.read(length).decode("utf-8")
         return s
 
+    def write_string_list(self: SaveHandler, f: BufferedWriter, string_list: list[str]) -> None:
+        self.write_number(f, len(string_list), "i")
+        for string in string_list:
+            self.write_string(f, string)
+
+    def read_string_list(self: SaveHandler, f: BufferedReader) -> list[str]:
+        length = self.read_number(f, "i")
+        string_list = []
+        for _ in range(int(length)):
+            string = self.read_string(f)
+            string_list.append(string)
+        return string_list
+
     def write_layer(self: SaveHandler, f: BufferedWriter, layer: Layer) -> None:
         self.write_string(f, layer.__class__.__name__)
-        int_list, float_list = layer.get_data()
+        int_list, float_list, string_list = layer.get_data()
         self.write_list(f, int_list, "i")
         self.write_list(f, float_list, "f")
+        self.write_string_list(f, string_list)
 
     def read_layer(self: SaveHandler, f: BufferedReader) -> Layer:
         layer_type = self.read_string(f)
         int_list = self.read_list(f, "i")
         float_list = self.read_list(f, "f")
+        string_list = self.read_string_list(f)
         new_layer: Layer = layer_types[layer_type]()
-        new_layer.load_from_data(int_list, float_list)
+        if isinstance(new_layer, Block):
+            new_layer.load_from_data(int_list, float_list, string_list, layer_types)
+        else:
+            new_layer.load_from_data(int_list, float_list, string_list)
         return new_layer
 
-    def save(self: SaveHandler, network: Network, name: str) -> None:
+    def save(self: SaveHandler, layer: Layer, name: str) -> None:
         path = self.get_path(name)
         with open(path, "wb") as f:
-            self.write_number(f, len(network.layers), "i")
-            self.write_number(f, network.lr, "f")
-            self.write_list(f, network.input_shape, "i")
-            self.write_list(f, network.output_shape, "i")
-            self.write_layer(f, network.exit_loss)
-            for layer in network.layers:
-                self.write_layer(f, layer)
+            self.write_layer(f, layer)
 
-    def load(self: SaveHandler, name: str) -> Network:
-        network = Network()
+    def load(self: SaveHandler, name: str) -> Layer:
         path = self.get_path(name)
         with open(path, "rb") as f:
-            len_layers = int(self.read_number(f, "i"))
-            network.lr = self.read_number(f, "f")
-            network.input_shape = tuple(self.read_list(f, "i"))
-            network.output_shape = tuple(self.read_list(f, "i"))
-            exit_loss = self.read_layer(f)
-            if isinstance(exit_loss, ExitLoss):
-                network.exit_loss = exit_loss
-            else:
-                raise MemoryError("Expected ExitLoss, got:", type(exit_loss))
-            for _ in range(len_layers):
-                new_layer = self.read_layer(f)
-                network.layers.append(new_layer)
-        return network
+            layer = self.read_layer(f)
+        return layer
 
     def test(self: SaveHandler):
         name = "test"

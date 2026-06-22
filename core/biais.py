@@ -20,12 +20,12 @@ class Biais(Layer):
         self.B -= self.lr * gradient
         return gradient
 
-    def get_data(self: Biais) -> tuple[list[int], list[float]]:
+    def get_data(self: Biais) -> tuple[list[int], list[float], list[str]]:
         int_list = list(self.input_shape)
         float_list = [self.lr] + self.B.flatten().tolist()
-        return int_list, float_list
+        return int_list, float_list, []
 
-    def load_from_data(self: Biais, int_list: list[int], float_list: list[float]) -> None:
+    def load_from_data(self: Biais, int_list: list[int], float_list: list[float], string_list: list[str]) -> None:
         self.input_shape = tuple(int_list)
         self.lr = float_list.pop(0)
         self.B = np.array(float_list).reshape(self.input_shape[0], 1)
@@ -48,12 +48,12 @@ class ConvBiais(Layer):
             self.B[i, 0] -= self.lr * np.sum(gradient[i, :, :])
         return gradient
 
-    def get_data(self: ConvBiais) -> tuple[list[int], list[float]]:
+    def get_data(self: ConvBiais) -> tuple[list[int], list[float], list[str]]:
         int_list = list(self.input_shape)
         float_list = [self.lr] + self.B.flatten().tolist()
-        return int_list, float_list
+        return int_list, float_list, []
 
-    def load_from_data(self: ConvBiais, int_list: list[int], float_list: list[float]) -> None:
+    def load_from_data(self: ConvBiais, int_list: list[int], float_list: list[float], string_list: list[str]) -> None:
         self.input_shape = tuple(int_list)
         self.lr = float_list.pop(0)
         self.B = np.array(float_list).reshape(self.input_shape[0], 1)

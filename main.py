@@ -1,4 +1,4 @@
-from core import Flatten, FC, Conv, ExitLoss, Network, Layer, ProbaExit
+from core import Flatten, FC, Conv, ExitLoss, Network, Layer, ProbaExit, Biais, ReLU, ConvBiais
 from data import load_mnist_data, SaveHandler
 from graphics import view_numbers, regression
 import numpy as np
@@ -6,13 +6,21 @@ from numpy.typing import NDArray
 import math
 import random
 
+
 def number_recognition() -> None:
     layers = [
         Conv(32, 3, 2),
+        ConvBiais(),
+        ReLU(),
         Conv(64, 3, 2),
+        ConvBiais(),
+        ReLU(),
         Conv(128, 3, 2),
+        ConvBiais(),
+        ReLU(),
         Flatten(),
-        FC(10)
+        FC(10),
+        Biais(),
     ]
     network = Network(layers=layers, exit_loss=ProbaExit(), input_shape=(1, 28, 28), lr=0.005)
 
@@ -20,6 +28,8 @@ def number_recognition() -> None:
     name = "number_recognition"
     if save_handler.has(name):
         network = save_handler.load(name)
+        if not isinstance(network, Network):
+            raise MemoryError
 
     data = load_mnist_data()
     network.train(data=data, batch=1)
@@ -33,7 +43,7 @@ def learn_shape() -> None:
         circle = math.sqrt(0.5 * (x - 0.5) ** 2 + (y - 0.5) ** 2)
         donut = math.sin(7.5 * circle)
         return donut
-    
+
     def get_data(dim: int) -> list[tuple[NDArray[np.float64], NDArray[np.float64]]]:
         data = []
         for _ in range(dim):
@@ -44,22 +54,38 @@ def learn_shape() -> None:
 
     layers: list[Layer] = [
         FC(40),
+        Biais(),
+        ReLU(),
         FC(40),
+        Biais(),
+        ReLU(),
         FC(40),
+        Biais(),
+        ReLU(),
         FC(40),
+        Biais(),
+        ReLU(),
         FC(40),
+        Biais(),
+        ReLU(),
         FC(40),
-        FC(1)
+        Biais(),
+        ReLU(),
+        FC(1),
+        Biais(),
     ]
     network = Network(layers=layers, exit_loss=ExitLoss(), input_shape=(2, 1), lr=0.0001)
 
     save_handler = SaveHandler()
-    name = "reproduce_shape2"
+    name = "reproduce_shape"
     if save_handler.has(name):
         network = save_handler.load(name)
+        if not isinstance(network, Network):
+            raise MemoryError
 
-    data = get_data(1000)
-    network.train(data=data, batch=1000)
+    batch = 1000
+    data = get_data(batch)
+    network.train(data=data, batch=batch)
     save_handler.save(network, name)
     regression(network, curve)
 

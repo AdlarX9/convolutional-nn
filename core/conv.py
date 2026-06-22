@@ -46,7 +46,9 @@ class Conv(Layer):
     def set_input_shape(self: Conv, input_shape: tuple[int, int, int]) -> tuple[int, int, int]:
         c, n, p = input_shape
         self.input_shape = input_shape
-        self.kernels = np.random.normal(0, np.sqrt(2 / (c * self.K**2)), size=(self.N, c, self.K, self.K))  # He
+        self.kernels = np.random.normal(
+            0, np.sqrt(2 / (c * self.K**2)), size=(self.N, c, self.K, self.K)
+        )  # He
         n_o = (n - self.K) // self.S + 1
         p_o = (p - self.K) // self.S + 1
         return (self.N, n_o, p_o)
@@ -72,13 +74,15 @@ class Conv(Layer):
         self.kernels -= self.lr * Wgrad
         return col2im(dXcol, self.input.shape, self.K, self.S)
 
-    def get_data(self: Conv) -> tuple[list[int], list[float]]:
+    def get_data(self: Conv) -> tuple[list[int], list[float], list[str]]:
         int_list = list(self.input_shape) + [self.K, self.S, self.N]
         float_list = [self.lr]
         float_list += self.kernels.flatten().tolist()
-        return int_list, float_list
+        return int_list, float_list, []
 
-    def load_from_data(self: Conv, int_list: list[int], float_list: list[float]) -> None:
+    def load_from_data(
+        self: Conv, int_list: list[int], float_list: list[float], string_list: list[str]
+    ) -> None:
         self.input_shape = tuple(int_list[:3])
         self.K = int_list[3]
         self.S = int_list[4]

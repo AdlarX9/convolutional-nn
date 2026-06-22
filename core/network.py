@@ -1,64 +1,26 @@
 import numpy as np
 from numpy.typing import NDArray
 from .layer import Layer
-from .conv import Conv
-from .biais import ConvBiais, Biais
-from .activation import ReLU
-from .fc import FC
 from .exit import ExitLoss
+from .block import Block
 from graphics import ConsoleVisualization
 
 
-class Network:
+class Network(Block):
     def __init__(
         self: Network,
         layers: list[Layer] = [],
-        exit_loss: ExitLoss = ExitLoss(),
         input_shape: tuple = (0,),
         lr: float = 0.0001,
+        exit_loss: ExitLoss = ExitLoss(),
     ) -> None:
-        self.lr = lr
-        self.input_shape = input_shape
-        self.output_shape = (0,)
-        self.exit_loss = exit_loss
-        self.layers = self.build_layers(layers)
-
-    def build_layers(self: Network, layers: list[Layer]) -> list[Layer]:
-        if len(layers) == 0:
-            return []
-        new_layers: list[Layer] = []
-        # Add unprecised layers
-        for i in range(len(layers)):
-            layer = layers[i]
-            if isinstance(layer, Conv):
-                new_layers.append(layer)
-                new_layers.append(ConvBiais())
-                new_layers.append(ReLU())
-            elif isinstance(layer, FC):
-                new_layers.append(layer)
-                new_layers.append(Biais())
-                new_layers.append(ReLU())
-            else:
-                new_layers.append(layer)
-        # Set Learning Rate and Input Shape
-        volume_shape = self.input_shape
-        for i in range(len(new_layers)):
-            new_layers[i].set_lr(self.lr)
-            volume_shape = new_layers[i].set_input_shape(volume_shape)
-            if i == len(new_layers) - 1:
-                self.output_shape = volume_shape
-        # Delete last ReLU layer
-        if type(new_layers[-1]) == ReLU:
-            new_layers.pop(-1)
-        return new_layers
-
-    def get_dimensions(self: Network) -> tuple[tuple, tuple]:
-        return self.input_shape, self.output_shape
+        super().__init__(*layers)
+        self.set_lr(lr)
+        self.set_input_shape(input_shape)
+        self.exit_loss: ExitLoss = exit_loss
 
     def compute(self: Network, entry: NDArray[np.float64], memorize: bool = False) -> NDArray[np.float64]:
-        volume = entry
-        for layer in self.layers:
-            volume = layer.compute(volume, memorize)
+        volume = super().compute(entry, memorize)
         volume = self.exit_loss.feed_forward(volume)
         return volume
 
@@ -69,8 +31,7 @@ class Network:
         loss = self.exit_loss.get_loss(prediction, answer)
         gradient = self.exit_loss.get_gradient(prediction, answer)
         correct = bool(np.argmax(prediction) == np.argmax(answer))
-        for i in range(len(self.layers) - 1, -1, -1):
-            gradient = self.layers[i].descend_gradient(gradient)
+        super().backprop(gradient)
         return loss, correct
 
     def train(
@@ -94,3 +55,23 @@ class Network:
         finally:
             if visualization is None:
                 dashboard.close()
+
+    def get_data(self: Network) -> tuple[list[int], list[float], list[str]]:
+        self.layers.append(self.exit_loss)
+        int_list, float_list, string_list = super().get_data()
+        self.layers.pop()
+        return int_list, float_list, string_list
+
+    def load_from_data(
+        self: Network,
+        int_list: list[int],
+        float_list: list[float],
+        string_list: list[str],
+        layer_types: dict[str, type[Layer]] = {},
+    ) -> None:
+        super().load_from_data(int_list, float_list, string_list, layer_types)
+        if isinstance(self.layers[-1], ExitLoss):
+            self.exit_loss = self.layers[-1]
+            self.layers.pop()
+        else:
+            raise MemoryError("No ExitLoss layer found")

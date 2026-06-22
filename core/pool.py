@@ -67,11 +67,13 @@ class Pool(Layer):
 
         return grad_padded
 
-    def get_data(self: Pool) -> tuple[list[int], list[float]]:
-        int_list, float_list = super().get_data()
+    def get_data(self: Pool) -> tuple[list[int], list[float], list[str]]:
+        int_list, float_list, string_list = super().get_data()
         int_list.append(self.dim)
-        return int_list, float_list
+        return int_list, float_list, string_list
 
-    def load_from_data(self: Pool, int_list: list[int], float_list: list[float]) -> None:
+    def load_from_data(
+        self: Pool, int_list: list[int], float_list: list[float], string_list: list[str]
+    ) -> None:
         self.dim = int_list.pop(-1)
-        super().load_from_data(int_list, float_list)
+        super().load_from_data(int_list, float_list, string_list)

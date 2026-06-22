@@ -7,4 +7,6 @@ from .conv import Conv
 from .fc import FC
 from .flatten import Flatten, AverageFlatten
 from .exit import ExitLoss, ProbaExit
+from .res import Res
+from .block import Block
 from .layer import Layer
