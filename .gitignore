@@ -1,6 +1,7 @@
 *.DS_Store
 *.vscode
 __pycache__
-data/dataset
+data/numbers
+data/text
 venv
-*.nn
+*.network

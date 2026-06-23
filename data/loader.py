@@ -4,6 +4,7 @@ import gzip
 import struct
 import urllib.request
 from pathlib import Path
+import os
 
 
 def _load_image_as_input(image_path: Path, image_size: tuple[int, int]) -> NDArray[np.float64]:
@@ -97,7 +98,7 @@ def _load_mnist_labels(file_path: Path) -> NDArray[np.int64]:
 
 
 def load_mnist_data(
-    cache_dir: str | Path = Path("data/dataset"), split: str = "train"
+    cache_dir: str | Path = Path(os.path.join("data", "numbers")), split: str = "train"
 ) -> list[tuple[NDArray[np.float64], NDArray[np.float64]]]:
     cache_path = Path(cache_dir)
 

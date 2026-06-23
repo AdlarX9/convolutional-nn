@@ -1,10 +1,11 @@
+from __future__ import annotations
 from .layer import Layer
 import numpy as np
 from numpy.typing import NDArray
 
 
 class BN(Layer):
-    def __init__(self):
+    def __init__(self: BN):
         super().__init__()
         self.gamma: NDArray[np.float64] = np.array([[]])
         self.beta: NDArray[np.float64] = np.array([[]])
@@ -13,13 +14,13 @@ class BN(Layer):
         self.var = np.var([[]])
         self.x_hat = np.var([[]])
 
-    def set_input_shape(self, input_shape: tuple[int, int, int]) -> tuple[int, int, int]:
+    def set_input_shape(self: BN, input_shape: tuple[int, int, int]) -> tuple[int, int, int]:
         C, _, _ = input_shape
         self.gamma = np.ones(C)
         self.beta = np.zeros(C)
         return input_shape
 
-    def feed_forward(self, entry: NDArray[np.float64]) -> NDArray[np.float64]:
+    def feed_forward(self: BN, entry: NDArray[np.float64]) -> NDArray[np.float64]:
         C, H, W = entry.shape
         # moyenne par canal
         self.mean = np.mean(entry, axis=(1, 2), keepdims=True)
@@ -29,7 +30,7 @@ class BN(Layer):
         output = self.gamma[:, None, None] * self.x_hat + self.beta[:, None, None]
         return output
 
-    def descend_gradient(self, gradient: NDArray[np.float64]) -> NDArray[np.float64]:
+    def descend_gradient(self: BN, gradient: NDArray[np.float64]) -> NDArray[np.float64]:
         if self.input is None or self.x_hat is None or self.gamma is None or self.beta is None:
             raise MemoryError
         _, H, W = gradient.shape

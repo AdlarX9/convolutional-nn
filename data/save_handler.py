@@ -1,3 +1,4 @@
+from __future__ import annotations
 from core import (
     Network,
     Layer,
@@ -13,6 +14,7 @@ from core import (
     BN,
     Pool,
     Res,
+    Embedding,
 )
 import os
 import struct
@@ -34,6 +36,7 @@ layer_types = {
     "BN": BN,
     "Pool": Pool,
     "Res": Res,
+    "Embedding": Embedding,
 }
 
 
@@ -51,7 +54,7 @@ class SaveHandler:
         self._initialized = True
 
     def get_path(self: SaveHandler, name: str) -> str:
-        return os.path.join("data", "models", name + ".nn")
+        return os.path.join("data", "models", name + ".network")
 
     def has(self: SaveHandler, name: str) -> bool:
         path = self.get_path(name)

@@ -1,4 +1,6 @@
 from .network import Network
+from .embedding import Embedding
+from .tokenizer import Tokenizer, normalize
 from .activation import ReLU
 from .bn import BN
 from .pool import Pool
